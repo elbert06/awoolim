@@ -52,6 +52,20 @@
   })
 
   const nextPage = (): void => {
+    switch (screen) {
+      case 2:
+        if (userData.name === '') {
+          alert($_('setup.username.empty'))
+          return
+        }
+        break
+      case 3:
+        if (userData.age <= 0) {
+          alert($_('setup.basics.age.empty'))
+          return
+        }
+        break
+    }
     contentContainer.classList.remove('noblur')
     setTimeout(() => {
       contentContainer.classList.add('noblur')
