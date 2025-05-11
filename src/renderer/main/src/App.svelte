@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { onMount } from 'svelte'
 
   let videoElement
@@ -6,7 +6,7 @@
   let stream = null
 
   // 웹캠 시작
-  async function startCamera() {
+  const startCamera = async (): Promise<void> => {
     try {
       stream = await navigator.mediaDevices.getUserMedia({ video: true })
       videoElement.srcObject = stream
@@ -17,7 +17,7 @@
   }
 
   // 프레임 캡처
-  function captureFrame() {
+  const captureFrame = (): string => {
     const canvas = document.createElement('canvas')
     canvas.width = videoElement.videoWidth
     canvas.height = videoElement.videoHeight
@@ -27,7 +27,7 @@
   }
 
   // 주기적 전송
-  function startCaptureLoop() {
+  const startCaptureLoop = (): void => {
     const base64 = captureFrame()
     window.electron.ipcRenderer.send('webcam-frame', base64)
     setTimeout(startCaptureLoop, 1000)

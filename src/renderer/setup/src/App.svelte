@@ -1,10 +1,11 @@
-<script>
+<script lang="ts">
   import { waitLocale, _ } from 'svelte-i18n'
   import { DotLottie } from '@lottiefiles/dotlottie-web'
   import globeIcon from './assets/globe.svg'
   import loadingAnim from './assets/loading.lottie'
   import { onMount } from 'svelte'
 
+  let dotLottie
   let conditions
 
   let title = []
@@ -50,7 +51,7 @@
     window.electron.ipcRenderer.send('get-permission-state')
   })
 
-  const nextPage = () => {
+  const nextPage = (): void => {
     contentContainer.classList.remove('noblur')
     setTimeout(() => {
       contentContainer.classList.add('noblur')
@@ -58,19 +59,20 @@
     }, 300)
   }
 
-  const grantPermission = () => {
+  const grantPermission = (): void => {
     window.electron.ipcRenderer.send('ask-permission')
   }
 
-  const setupComplete = () => {
+  const setupComplete = (): void => {
     userData.language = $_('language_code')
     window.electron.ipcRenderer.send('setup-complete', userData)
   }
 
-  window.electron.ipcRenderer.on('permission-state', (event, state) => {
+  window.electron.ipcRenderer.on('permission-state', (_event, state) => {
     if (state === 'granted') {
       loadingCanvas.style.opacity = 0
       setTimeout(() => {
+        dotLottie.stop()
         splashContainer.style.opacity = 0
         setTimeout(() => {
           splashContainer.style.display = 'none'
@@ -83,7 +85,7 @@
   })
 
   onMount(() => {
-    const dotLottie = new DotLottie({
+    dotLottie = new DotLottie({
       autoplay: true,
       loop: true,
       canvas: loadingCanvas,
@@ -102,6 +104,7 @@
     <div id="contentContainer" class="noblur" bind:this={contentContainer}>
       <div id="information">
         <h1>{title[screen]}</h1>
+        <!-- eslint-disable-next-line svelte/no-at-html-tags -->
         <span>{@html description[screen]}</span>
       </div>
       <div id="action">
@@ -131,7 +134,7 @@
               </select>
             </label>
           {:else if screen == 4}
-            {#each conditions as condition}
+            {#each conditions as condition (condition.value)}
               <label class="narrow">
                 <input type="checkbox" value={condition.value} bind:group={userData.conditions} />
                 {condition.label}
