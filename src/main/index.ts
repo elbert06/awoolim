@@ -12,7 +12,7 @@ import { error } from 'console'
 
 const store = new Store()
 let now = new Date().getTime()
-let new_date = new Date().getTime()
+let newDate = new Date().getTime()
 console.log(now)
 
 let userData: userData = {
@@ -64,12 +64,12 @@ async function createMainWindow(): Promise<void> {
 
   checkSetup()
 
-  const time_did = await getDataAndCommunicateWithGemini()
-  console.log('time_analyze : ', time_did)
+  const timeDid = await getDataAndCommunicateWithGemini()
+  console.log('time_analyze : ', timeDid)
 
   ipcMain.on('webcam-frame', async (_event, base64: string) => {
     const imageBuffer = Buffer.from(base64.split(',')[1], 'base64')
-    await checkTime(imageBuffer, time_did)
+    await checkTime(imageBuffer, timeDid)
     await readImages(imageBuffer)
   })
 }
@@ -215,7 +215,7 @@ async function checkSetup(): Promise<void> {
 }
 
 async function getDataAndCommunicateWithGemini(): Promise<number> {
-  const send_script =
+  const sendScript =
     '\
   this person is ' +
     userData.age +
@@ -227,17 +227,17 @@ async function getDataAndCommunicateWithGemini(): Promise<number> {
     '\
   this person is developer, and this person work. \
   Tell me how much time we have to work per resting 10 minutes'
-  const send_gemini = await getSendGemini(send_script, 0)
-  if (send_gemini == undefined) {
+  const sendGemini = await getSendGemini(sendScript, 0)
+  if (sendGemini == undefined) {
     consola.error('Gemini response is undefined')
     return 0
   }
-  const result = JSON.parse(send_gemini)
+  const result = JSON.parse(sendGemini)
 
   return parseInt(result['result'])
 }
 
-async function getSendGemini(gemini_thing: string, option: number): Promise<string> {
+async function getSendGemini(geminiThing: string, option: number): Promise<string> {
   const ai = new GoogleGenAI({ apiKey: 'AIzaSyAzyrPJFxwRD_uvl6rdyjYW0-NjE4MDd-g' })
   let config = {}
   if (option == 0) {
@@ -256,7 +256,7 @@ async function getSendGemini(gemini_thing: string, option: number): Promise<stri
   const response = await ai.models.generateContent({
     model: 'gemini-2.5-pro-exp-03-25',
     config: config,
-    contents: gemini_thing
+    contents: geminiThing
   })
   return response.text || ''
 }
@@ -436,13 +436,13 @@ async function checkIsPerson(imageBuffer: Buffer): Promise<boolean> {
   return hasPerson
 }
 
-async function checkTime(imageBuffer: Buffer, time_can_do: number): Promise<void> {
+async function checkTime(imageBuffer: Buffer, timeCanDo: number): Promise<void> {
   const isPerson = await checkIsPerson(imageBuffer)
   if (isPerson) {
-    new_date = new Date().getTime()
-    const time_did = new_date - now
-    if (time_did / 1000 > 60 * time_can_do) {
-      console.log('time_did : ', time_did)
+    newDate = new Date().getTime()
+    const timeDid = newDate - now
+    if (timeDid / 1000 > 60 * timeCanDo) {
+      console.log('timeDid : ', timeDid)
     }
   } else {
     now = new Date().getTime()
