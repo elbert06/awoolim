@@ -12,12 +12,12 @@ import icon from '../../resources/icon.png?asset'
 const store = new Store()
 let now = new Date().getTime()
 let newDate = new Date().getTime()
-let bend_time = new Date().getTime()
-let new_bend_time = new Date().getTime()
-let collapse_time = new Date().getTime()
-let new_collapse_time = new Date().getTime()
-let focus_time = new Date().getTime()
-let new_focus_time = new Date().getTime()
+let bendTime = new Date().getTime()
+let newBendTime = new Date().getTime()
+let collapseTime = new Date().getTime()
+let newCollapseTime = new Date().getTime()
+let focusTime = new Date().getTime()
+let newFocusTime = new Date().getTime()
 consola.log(now)
 
 let userData: userData = {
@@ -392,27 +392,37 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
     '7': 좌우기울어짐,
     '8': 화면가까움
   }
-  new_bend_time = new Date().getTime()
-  new_collapse_time = new Date().getTime()
-  new_focus_time = new Date().getTime()
-  if (result['3'] == true && result['4'] == true && result['8'] == true && new_bend_time - bend_time > 60 * 2) {
+  newBendTime = new Date().getTime()
+  newCollapseTime = new Date().getTime()
+  newFocusTime = new Date().getTime()
+  if (
+    result['3'] == true &&
+    result['4'] == true &&
+    result['8'] == true &&
+    newBendTime - bendTime > 60000 * 2
+  ) {
     //animation()
-  }else if(result['3'] == false || result['4'] == false || result['8'] == false) {
-    bend_time = new Date().getTime()
+  } else if (result['3'] == false || result['4'] == false || result['8'] == false) {
+    bendTime = new Date().getTime()
   }
 
-  if (result['0'] == true && result['2'] == true && result['7'] == true && new_collapse_time - bend_time > 60 * 2) {
+  if (
+    result['0'] == true &&
+    result['2'] == true &&
+    result['7'] == true &&
+    newCollapseTime - collapseTime > 60000 * 2
+  ) {
     //animation()
-  }else if(result['0'] == false || result['2'] == false || result['7'] == false) {
-    collapse_time = new Date().getTime()
+  } else if (result['0'] == false || result['2'] == false || result['7'] == false) {
+    collapseTime = new Date().getTime()
   }
-  
-  if (result['2'] == true && result['4'] == true && new_focus_time - bend_time > 60 * 2) {
+
+  if (result['2'] == true && result['4'] == true && newFocusTime - focusTime > 60000 * 2) {
     //animation()
-  }else if(result['2'] == false || result['4'] == false) {
-    focus_time = new Date().getTime()
+  } else if (result['2'] == false || result['4'] == false) {
+    focusTime = new Date().getTime()
   }
-  
+
   // consola.log(getSendGemini('give one sentence advice with this json skeleton file. this array result means\
   //   const result = {\
   //   "0": "Neck Tilt"\
