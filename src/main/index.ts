@@ -8,12 +8,11 @@ import Store from 'electron-store'
 import consola from 'consola'
 import sharp from 'sharp'
 import icon from '../../resources/icon.png?asset'
-import { error } from 'console'
 
 const store = new Store()
 let now = new Date().getTime()
 let newDate = new Date().getTime()
-console.log(now)
+consola.log(now)
 
 let userData: userData = {
   language: 'en',
@@ -65,7 +64,7 @@ async function createMainWindow(): Promise<void> {
   checkSetup()
 
   const timeDid = await getDataAndCommunicateWithGemini()
-  console.log('time_analyze : ', timeDid)
+  consola.log('time_analyze : ', timeDid)
 
   ipcMain.on('webcam-frame', async (_event, base64: string) => {
     const imageBuffer = Buffer.from(base64.split(',')[1], 'base64')
@@ -200,17 +199,17 @@ async function checkTflite(): Promise<boolean> {
     model.predict(input)
     return true
   } catch (error) {
-    console.error('Error loading tflite model:', error)
+    consola.error('Error loading tflite model:', error)
     return false
   }
 }
 
 async function checkSetup(): Promise<void> {
   if (await checkTflite()) {
-    console.log('tflite model loaded')
+    consola.log('tflite model loaded')
   } else {
-    console.log('Failed to load tflite model')
-    error('Failed to load tflite model')
+    consola.log('Failed to load tflite model')
+    consola.error('Failed to load tflite model')
   }
 }
 
@@ -387,8 +386,8 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
     '7': 좌우기울어짐,
     '8': 화면가까움
   }
-  console.log(result)
-  // console.log(getSendGemini('give one sentence advice with this json skeleton file. this array result means\
+  consola.log(result)
+  // consola.log(getSendGemini('give one sentence advice with this json skeleton file. this array result means\
   //   const result = {\
   //   "0": "Neck Tilt"\
   //   "1": "Shoulder Asymmetry"\
@@ -442,10 +441,10 @@ async function checkTime(imageBuffer: Buffer, timeCanDo: number): Promise<void> 
     newDate = new Date().getTime()
     const timeDid = newDate - now
     if (timeDid / 1000 > 60 * timeCanDo) {
-      console.log('timeDid : ', timeDid)
+      consola.log('timeDid : ', timeDid)
     }
   } else {
     now = new Date().getTime()
-    console.log('no person, so reset')
+    consola.log('no person, so reset')
   }
 }
