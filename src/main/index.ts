@@ -16,7 +16,8 @@ let bend_time = new Date().getTime()
 let new_bend_time = new Date().getTime()
 let collapse_time = new Date().getTime()
 let new_collapse_time = new Date().getTime()
-
+let focus_time = new Date().getTime()
+let new_focus_time = new Date().getTime()
 consola.log(now)
 
 let userData: userData = {
@@ -392,17 +393,24 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
     '8': 화면가까움
   }
   new_bend_time = new Date().getTime()
-  new_bend_time = new Date().getTime()
+  new_collapse_time = new Date().getTime()
+  new_focus_time = new Date().getTime()
   if (result['3'] == true && result['4'] == true && result['8'] == true && new_bend_time - bend_time > 60 * 2) {
     //animation()
   }else if(result['3'] == false || result['4'] == false || result['8'] == false) {
     bend_time = new Date().getTime()
   }
 
-  if (result['0'] == true && result['2'] == true && result['7'] == true && new_bend_time - bend_time > 60 * 2) {
+  if (result['0'] == true && result['2'] == true && result['7'] == true && new_collapse_time - bend_time > 60 * 2) {
     //animation()
   }else if(result['0'] == false || result['2'] == false || result['7'] == false) {
     collapse_time = new Date().getTime()
+  }
+  
+  if (result['2'] == true && result['4'] == true && new_focus_time - bend_time > 60 * 2) {
+    //animation()
+  }else if(result['2'] == false || result['4'] == false) {
+    focus_time = new Date().getTime()
   }
   
   // consola.log(getSendGemini('give one sentence advice with this json skeleton file. this array result means\
