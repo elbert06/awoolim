@@ -410,4 +410,8 @@
     background-color: rgba(var(--text-color), 0.5);
     border-color: rgba(var(--text-color), 0.2);
   }
+
+  select > option {
+    color: rgb(var(--background-color));
+  }
 </style>
