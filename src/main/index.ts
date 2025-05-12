@@ -18,7 +18,6 @@ let collapseTime = new Date().getTime()
 let newCollapseTime = new Date().getTime()
 let focusTime = new Date().getTime()
 let newFocusTime = new Date().getTime()
-consola.log(now)
 
 let userData: userData = {
   language: 'en',
@@ -197,7 +196,7 @@ function setupComplete(_event: IpcMainEvent, data: userData): void {
 async function checkTflite(): Promise<boolean> {
   try {
     // 1. .tflite 모델 로드
-    const model = await tflite.loadTFLiteModel(join(__dirname, '../../resources/model/1.tflite'))
+    const model = await tflite.loadTFLiteModel(join(__dirname, '../../resources/models/1.tflite'))
     // 2. ?��?�� ?��?�� ?��?�� (?��: 224x224 RGB ?��미�??)
     const input = tf.zeros([1, 353, 257, 3])
     // 3. 추론
@@ -285,7 +284,7 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
   const input = tf.tensor(new Uint8Array(resizedImageBuffer), [1, 353, 257, 3])
 
   // 1. .tflite 모델 로드
-  const model = await tflite.loadTFLiteModel(join(__dirname, '../../resources/model/1.tflite'))
+  const model = await tflite.loadTFLiteModel(join(__dirname, '../../resources/models/1.tflite'))
 
   // 3. 추론
   // @ts-ignore "This error is caused by the version difference of tfjs and tfjs-tflite-node"
@@ -440,7 +439,7 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
 
 async function checkIsPerson(imageBuffer: Buffer): Promise<boolean> {
   // 1. .tflite 모델 로드
-  const model = await tflite.loadTFLiteModel(join(__dirname, '../../models/2.tflite'))
+  const model = await tflite.loadTFLiteModel(join(__dirname, '../../resources/models/2.tflite'))
   // 2. ?��?�� ?��?�� ?��?�� (?��: 224x224 RGB ?��미�??)
   const resizedImageBuffer = await sharp(imageBuffer)
     .resize(300, 300)
