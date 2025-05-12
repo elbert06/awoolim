@@ -12,6 +12,8 @@ import icon from '../../resources/icon.png?asset'
 const store = new Store()
 let now = new Date().getTime()
 let newDate = new Date().getTime()
+let bend_time = new Date().getTime()
+let new_bend_time = new Date().getTime()
 consola.log(now)
 
 let userData: userData = {
@@ -386,7 +388,12 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
     '7': 좌우기울어짐,
     '8': 화면가까움
   }
-  consola.log(result)
+  new_bend_time = new Date().getTime()
+  if (result['3'] == true && result['4'] == true && result['8'] == true && new_bend_time - bend_time > 60 * 2) {
+    //animation()
+  }else{
+    bend_time = new Date().getTime()
+  }
   // consola.log(getSendGemini('give one sentence advice with this json skeleton file. this array result means\
   //   const result = {\
   //   "0": "Neck Tilt"\
