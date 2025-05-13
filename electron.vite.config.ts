@@ -26,7 +26,8 @@ export default defineConfig({
       rollupOptions: {
         input: {
           main: join(__dirname, '/src/renderer/main/index.html'),
-          setup: join(__dirname, '/src/renderer/setup/index.html')
+          setup: join(__dirname, '/src/renderer/setup/index.html'),
+          chara: join(__dirname, '/src/renderer/chara/index.html')
         }
       }
     }

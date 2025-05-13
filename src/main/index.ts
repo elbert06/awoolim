@@ -1,4 +1,12 @@
-import { app, shell, BrowserWindow, ipcMain, IpcMainEvent, systemPreferences } from 'electron'
+import {
+  app,
+  BrowserWindow,
+  ipcMain,
+  IpcMainEvent,
+  systemPreferences,
+  screen,
+  dialog
+} from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { GoogleGenAI, Type } from '@google/genai'
@@ -19,6 +27,10 @@ let newCollapseTime = new Date().getTime()
 let focusTime = new Date().getTime()
 let newFocusTime = new Date().getTime()
 
+let mainWindow: BrowserWindow | null = null
+let setupWindow: BrowserWindow | null = null
+let charaWindow: BrowserWindow | null = null
+
 let userData: userData = {
   language: 'en',
   name: '',
@@ -30,9 +42,9 @@ let userData: userData = {
 
 async function createMainWindow(): Promise<void> {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+  mainWindow = new BrowserWindow({
+    width: 500,
+    height: 300,
     transparent: true,
     frame: false,
     resizable: false,
@@ -50,12 +62,7 @@ async function createMainWindow(): Promise<void> {
   mainWindow.setIgnoreMouseEvents(true)
 
   mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
-  })
-
-  mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
-    return { action: 'deny' }
+    mainWindow?.show()
   })
 
   // HMR for renderer base on electron-vite cli.
@@ -66,10 +73,34 @@ async function createMainWindow(): Promise<void> {
     mainWindow.loadFile(join(__dirname, '../renderer/main/index.html'))
   }
 
+  createCharaWindow()
+
   checkSetup()
 
+  ipcMain.on('webcam-error', async () => {
+    dialog.showErrorBox(
+      'Initializing webcam failed',
+      'Webcam is not available.\nPlease check your webcam or permission settings.\n\nApplication will be terminated.'
+    )
+    consola.error('Initializing webcam failed, terminating application')
+    app.quit()
+  })
+
+  // animation test
+  //
+  // setInterval(() => {
+  //   consola.log('show-animation 1')
+  //   charaWindow?.webContents.send('show-animation', 1)
+  //   setTimeout(() => {
+  //     consola.log('show-animation 2')
+  //     charaWindow?.webContents.send('show-animation', 2)
+  //   }, 5000)
+  // }, 10000)
+
+  consola.start('Getting data from Gemini...\nProgram will be started after getting data')
   const timeDid = await getDataAndCommunicateWithGemini()
-  consola.log('time_analyze : ', timeDid)
+  consola.info('Time to work per resting 10 minutes:', timeDid)
+  consola.success('Program is successfully started!')
 
   ipcMain.on('webcam-frame', async (_event, base64: string) => {
     const imageBuffer = Buffer.from(base64.split(',')[1], 'base64')
@@ -78,8 +109,45 @@ async function createMainWindow(): Promise<void> {
   })
 }
 
+function createCharaWindow(): void {
+  const primaryDisplay = screen.getPrimaryDisplay()
+  const { width, height } = primaryDisplay.workAreaSize
+  const windowWidth = 500
+  const windowHeight = 500
+  charaWindow = new BrowserWindow({
+    transparent: true,
+    frame: false,
+    resizable: false,
+    focusable: false,
+    alwaysOnTop: true,
+    skipTaskbar: true,
+    hasShadow: false,
+    width: windowWidth,
+    height: windowHeight,
+    x: width - windowWidth,
+    y: height - windowHeight,
+    ...(process.platform === 'linux' ? { icon } : {}),
+    webPreferences: {
+      preload: join(__dirname, '../preload/index.mjs'),
+      sandbox: false
+    }
+  })
+
+  charaWindow.setIgnoreMouseEvents(true)
+
+  charaWindow.on('ready-to-show', () => {
+    charaWindow?.show()
+  })
+
+  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+    charaWindow.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/chara/index.html`)
+  } else {
+    charaWindow.loadFile(join(__dirname, '../renderer/chara/index.html'))
+  }
+}
+
 function createSetupWindow(): void {
-  const setupWindow = new BrowserWindow({
+  setupWindow = new BrowserWindow({
     width: 900,
     height: 600,
     show: false,
@@ -92,12 +160,7 @@ function createSetupWindow(): void {
   })
 
   setupWindow.on('ready-to-show', () => {
-    setupWindow.show()
-  })
-
-  setupWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
-    return { action: 'deny' }
+    setupWindow?.show()
   })
 
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
@@ -120,30 +183,21 @@ app.whenReady().then(async () => {
   consola.info('OS version:', process.platform, process.getSystemVersion())
   consola.info('OS architecture:', process.arch)
 
-  electronApp.setAppUserModelId('com.electron')
+  electronApp.setAppUserModelId('com.awoolim.app')
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // if (store.get('userData') == undefined) {
-  //   consola.warn('User data not found, creating setup window')
-  createSetupWindow()
-  // } else {
-  //   consola.success('User data found, loading user data')
-  //   userData = (await store.get('userData')) as userData
-  //   consola.debug('User data loaded:', userData)
-  //   createMainWindow()
-  // }
-
-  // tflite 모델 로드 여부
-  // ipcMain.on('three', () => three())
-
-  app.on('activate', function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createMainWindow()
-  })
+  if (store.get('userData') == undefined) {
+    consola.warn('User data not found, creating setup window')
+    createSetupWindow()
+  } else {
+    consola.success('User data found, loading user data')
+    userData = (await store.get('userData')) as userData
+    consola.debug('User data loaded:', userData)
+    createMainWindow()
+  }
 })
 
 app.on('window-all-closed', () => {
@@ -211,9 +265,8 @@ async function checkTflite(): Promise<boolean> {
 
 async function checkSetup(): Promise<void> {
   if (await checkTflite()) {
-    consola.log('tflite model loaded')
+    consola.success('tflite model loaded')
   } else {
-    consola.log('Failed to load tflite model')
     consola.error('Failed to load tflite model')
   }
 }
@@ -400,7 +453,8 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
     result['8'] == true &&
     newBendTime - bendTime > 60000 * 2
   ) {
-    //animation()
+    // 거북목
+    charaWindow?.webContents.send('show-animation', 1)
   } else if (result['3'] == false || result['4'] == false || result['8'] == false) {
     bendTime = new Date().getTime()
   }
@@ -411,13 +465,15 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
     result['7'] == true &&
     newCollapseTime - collapseTime > 60000 * 2
   ) {
-    //animation()
+    // 자세 무너짐
+    charaWindow?.webContents.send('show-animation', 2)
   } else if (result['0'] == false || result['2'] == false || result['7'] == false) {
     collapseTime = new Date().getTime()
   }
 
   if (result['2'] == true && result['4'] == true && newFocusTime - focusTime > 60000 * 2) {
-    //animation()
+    // 화면에 너무 가까움
+    charaWindow?.webContents.send('show-animation', 3)
   } else if (result['2'] == false || result['4'] == false) {
     focusTime = new Date().getTime()
   }
@@ -475,8 +531,8 @@ async function checkTime(imageBuffer: Buffer, timeCanDo: number): Promise<void> 
   if (isPerson) {
     newDate = new Date().getTime()
     const timeDid = newDate - now
-    if (timeDid / 1000 > 60 * timeCanDo) {
-      consola.log('timeDid : ', timeDid)
+    if (timeDid / 1000 >= 60 * timeCanDo) {
+      charaWindow?.webContents.send('show-animation', 4)
     }
   } else {
     now = new Date().getTime()

@@ -12,7 +12,8 @@
       videoElement.srcObject = stream
       await videoElement.play()
     } catch (err) {
-      console.error('웹캠 접근 실패:', err)
+      window.electron.ipcRenderer.send('webcam-error')
+      console.error('Error accessing webcam:', err)
     }
   }
 
@@ -49,6 +50,6 @@
     max-width: 640px;
     border: 1px solid #ccc;
     border-radius: 8px;
-    /* opacity: 0; */
+    opacity: 0;
   }
 </style>
