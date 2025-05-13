@@ -6,8 +6,7 @@
   import { onMount } from 'svelte'
 
   let dotLottie
-  let conditions
-
+  let conditions = []
   let title = []
   let description = []
   let screen = -1
