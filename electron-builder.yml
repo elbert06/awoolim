@@ -1,4 +1,4 @@
-appId: com.electron.app
+appId: com.awoolim.app
 productName: awoolim
 directories:
   buildResources: build
@@ -34,13 +34,13 @@ linux:
     - AppImage
     - snap
     - deb
-  maintainer: electronjs.org
+  maintainer: awoolim.com
   category: Utility
 appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
 publish:
   provider: generic
-  url: https://example.com/auto-updates
+  url: https://awoolim.com/auto-updates
 electronDownload:
   mirror: https://npmmirror.com/mirrors/electron/

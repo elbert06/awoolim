@@ -10,8 +10,9 @@ import {
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { GoogleGenAI, Type } from '@google/genai'
-import * as tf from '@tensorflow/tfjs'
-import * as tflite from 'tfjs-tflite-node'
+import '@tensorflow/tfjs-backend-cpu'
+import * as tf from '@tensorflow/tfjs-core'
+import { loadTFLiteModel } from 'tfjs-tflite-node'
 import Store from 'electron-store'
 import consola from 'consola'
 import sharp from 'sharp'
@@ -87,7 +88,7 @@ async function createMainWindow(): Promise<void> {
   })
 
   // animation test
-  //
+
   // setInterval(() => {
   //   consola.log('show-animation 1')
   //   charaWindow?.webContents.send('show-animation', 1)
@@ -250,7 +251,7 @@ function setupComplete(_event: IpcMainEvent, data: userData): void {
 async function checkTflite(): Promise<boolean> {
   try {
     // 1. .tflite 모델 로드
-    const model = await tflite.loadTFLiteModel(join(__dirname, '../../resources/models/1.tflite'))
+    const model = await loadTFLiteModel(join(__dirname, '../../resources/models/1.tflite'))
     // 2. ?��?�� ?��?�� ?��?�� (?��: 224x224 RGB ?��미�??)
     const input = tf.zeros([1, 353, 257, 3])
     // 3. 추론
@@ -337,7 +338,7 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
   const input = tf.tensor(new Uint8Array(resizedImageBuffer), [1, 353, 257, 3])
 
   // 1. .tflite 모델 로드
-  const model = await tflite.loadTFLiteModel(join(__dirname, '../../resources/models/1.tflite'))
+  const model = await loadTFLiteModel(join(__dirname, '../../resources/models/1.tflite'))
 
   // 3. 추론
   // @ts-ignore "This error is caused by the version difference of tfjs and tfjs-tflite-node"
@@ -495,7 +496,7 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
 
 async function checkIsPerson(imageBuffer: Buffer): Promise<boolean> {
   // 1. .tflite 모델 로드
-  const model = await tflite.loadTFLiteModel(join(__dirname, '../../resources/models/2.tflite'))
+  const model = await loadTFLiteModel(join(__dirname, '../../resources/models/2.tflite'))
   // 2. ?��?�� ?��?�� ?��?�� (?��: 224x224 RGB ?��미�??)
   const resizedImageBuffer = await sharp(imageBuffer)
     .resize(300, 300)
