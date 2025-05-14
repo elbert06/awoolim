@@ -36,7 +36,6 @@ let userData: userData = {
 }
 const howBadPoseIs = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 async function createMainWindow(): Promise<void> {
-  // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 500,
     height: 300,
@@ -60,8 +59,6 @@ async function createMainWindow(): Promise<void> {
     mainWindow?.show()
   })
 
-  // HMR for renderer base on electron-vite cli.
-  // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
     mainWindow.loadURL(`${process.env['ELECTRON_RENDERER_URL']}/main/index.html`)
   } else {
@@ -80,17 +77,6 @@ async function createMainWindow(): Promise<void> {
     consola.error('Initializing webcam failed, terminating application')
     app.quit()
   })
-
-  // animation test
-
-  // setInterval(() => {
-  //   consola.log('show-animation 1')
-  //   charaWindow?.webContents.send('show-animation', 1)
-  //   setTimeout(() => {
-  //     consola.log('show-animation 2')
-  //     charaWindow?.webContents.send('show-animation', 2)
-  //   }, 5000)
-  // }, 10000)
 
   consola.start('Getting data from Gemini...\nProgram will be started after getting data')
   const timeDid = await getDataAndCommunicateWithGemini()
@@ -220,7 +206,6 @@ async function askPermission(event: IpcMainEvent): Promise<void> {
       event.sender.send('permission-state', 'denied')
     }
   } else {
-    // todo : ask for permission on other platforms
     consola.error('Camera permission is not supported on this platform')
   }
 }
@@ -328,13 +313,9 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
     .raw()
     .toBuffer()
 
-  // 2. Tensor�? �??�� (shape: [1, 353, 257, 3])
   const input = tf.tensor(new Uint8Array(resizedImageBuffer), [1, 353, 257, 3])
-
-  // 1. .tflite 모델 로드
   const model = await loadTFLiteModel(join(__dirname, '../../resources/models/1.tflite'))
 
-  // 3. 추론
   // @ts-ignore "This error is caused by the version difference of tfjs and tfjs-tflite-node"
   const output = model.predict(input)
   // @ts-ignore "This error is caused by the version difference of tfjs and tfjs-tflite-node"
@@ -378,7 +359,6 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
     return values.reduce((a, b) => a + b) / values.length
   }
 
-  // 좌표 할당
   const nose = keypoints[0]
   const leftEye = keypoints[1]
   const rightEye = keypoints[2]
@@ -480,26 +460,10 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
       }
     }
   }
-
-  // consola.log(getSendGemini('give one sentence advice with this json skeleton file. this array result means\
-  //   const result = {\
-  //   "0": "Neck Tilt"\
-  //   "1": "Shoulder Asymmetry"\
-  //   "2": "Rounded Shoulders"\
-  //   "3": "Upper Body Tilt"\
-  //   "4": "Head Drop"\
-  //   "5": "Shoulder Roll"\
-  //   "6": "Body Twist"\
-  //   "7": "Lateral Tilt"\
-  //   "8": "Too Close to Screen"\
-  // }; '
-  // +JSON.stringify(result),1));
 }
 
 async function checkIsPerson(imageBuffer: Buffer): Promise<boolean> {
-  // 1. .tflite 모델 로드
   const model = await loadTFLiteModel(join(__dirname, '../../resources/models/2.tflite'))
-  // 2. ?��?�� ?��?�� ?��?�� (?��: 224x224 RGB ?��미�??)
   const resizedImageBuffer = await sharp(imageBuffer)
     .resize(300, 300)
     .removeAlpha()
@@ -507,7 +471,6 @@ async function checkIsPerson(imageBuffer: Buffer): Promise<boolean> {
     .toBuffer()
 
   const input = tf.tensor(new Uint8Array(resizedImageBuffer), [1, 300, 300, 3], 'int32')
-  // 3. 추론
   // @ts-ignore "This error is caused by the version difference of tfjs and tfjs-tflite-node"
   const response = model.predict(input)
   const classIds = response['TFLite_Detection_PostProcess:1']
