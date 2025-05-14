@@ -26,6 +26,7 @@ let mainWindow: BrowserWindow | null = null
 let setupWindow: BrowserWindow | null = null
 let charaWindow: BrowserWindow | null = null
 let isChecking = true
+let isFixed = [0,0,0];
 let userData: userData = {
   language: 'en',
   name: '',
@@ -441,12 +442,42 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
     if (howBadPoseIs[3] > 40 && howBadPoseIs[4] > 40 && howBadPoseIs[8] > 40) {
       // 거북목
       charaWindow?.webContents.send('show-animation', 1)
-    } else if (howBadPoseIs[0] > 40 && howBadPoseIs[2] > 40 && howBadPoseIs[7] > 40) {
+      isFixed[0] += 1
+      if(isFixed[0] > 3){
+        // charaWindow?.webContents.send('show-animation', 5) (교정 실패)
+      }
+    } else{
+      if (isFixed[0] != 0){
+        //(교정 성공)
+      }
+      isFixed[0] = 0
+    }
+    if (howBadPoseIs[0] > 40 && howBadPoseIs[2] > 40 && howBadPoseIs[7] > 40) {
       // 자세 무너짐
       charaWindow?.webContents.send('show-animation', 2)
-    } else if (howBadPoseIs[2] > 40 && howBadPoseIs[4] > 40) {
+      isFixed[1] += 1
+      if(isFixed[1] > 3){
+        // charaWindow?.webContents.send('show-animation', 5) (교정 실패)
+      }
+    } else{
+      if (isFixed[1] != 0){
+        //(교정 성공)
+      }
+      isFixed[1] = 0
+      
+    } 
+    
+    if (howBadPoseIs[2] > 40 && howBadPoseIs[4] > 40) {
       // 고개 숙임 & 집중 잃음
       charaWindow?.webContents.send('show-animation', 3)
+      isFixed[2] += 1
+      if(isFixed[2] > 3){
+          // charaWindow?.webContents.send('show-animation', 5) (교정 실패)
+        }
+      } else{
+        if (isFixed[2] != 0){
+          //(교정 성공)
+      }isFixed[2] = 0
     }
     poseNow = newUpdateTime
     for (let i = 0; i < 9; i++) {
@@ -500,6 +531,7 @@ async function checkTime(imageBuffer: Buffer, timeCanDo: number): Promise<void> 
     if (isChecking == false && timeDid / 1000 > 600){
       isChecking = true
       now = newDate
+      
     }else if (timeDid / 1000 >= 60 * timeCanDo) {
       charaWindow?.webContents.send('show-animation', 4)
       isChecking = false
