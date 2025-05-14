@@ -445,7 +445,7 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
       // 자세 무너짐
       charaWindow?.webContents.send('show-animation', 2)
     } else if (howBadPoseIs[2] > 40 && howBadPoseIs[4] > 40) {
-      // 화면에 너무 가까움
+      // 고개 숙임 & 집중 잃음
       charaWindow?.webContents.send('show-animation', 3)
     }
     poseNow = newUpdateTime
