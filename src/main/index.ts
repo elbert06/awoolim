@@ -26,7 +26,7 @@ let mainWindow: BrowserWindow | null = null
 let setupWindow: BrowserWindow | null = null
 let charaWindow: BrowserWindow | null = null
 let isChecking = true
-let isFixed = [0,0,0];
+const isFixed = [0, 0, 0]
 let userData: userData = {
   language: 'en',
   name: '',
@@ -422,66 +422,55 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
   }
   const newUpdateTime = new Date().getTime()
   if (newUpdateTime - poseNow > 60 * 1000) {
-    const boolResult = {
-      '0': false,
-      '1': false,
-      '2': false,
-      '3': false,
-      '4': false,
-      '5': false,
-      '6': false,
-      '7': false,
-      '8': false
-    }
-    for (let i = 0; i < 9; i++) {
-      if (howBadPoseIs[i] > 40) {
-        boolResult[i] = true
-      }
-    }
-    // 애니메이션은 1개만 재생 되도록
-    if (howBadPoseIs[3] > 40 && howBadPoseIs[4] > 40 && howBadPoseIs[8] > 40) {
+    const reference = 40 // 판단기준 (1초에 40회)
+
+    if (howBadPoseIs[3] > reference && howBadPoseIs[4] > reference && howBadPoseIs[8] > reference) {
       // 거북목
-      charaWindow?.webContents.send('show-animation', 1)
       isFixed[0] += 1
-      if(isFixed[0] > 3){
-        // charaWindow?.webContents.send('show-animation', 5) (교정 실패)
+      if (isFixed[0] > 3) {
+        charaWindow?.webContents.send('show-animation', 5)
+      } else {
+        charaWindow?.webContents.send('show-animation', 1)
       }
-    } else{
-      if (isFixed[0] != 0){
-        //(교정 성공)
+    } else {
+      if (isFixed[0] != 0) {
+        charaWindow?.webContents.send('show-animation', 6)
       }
       isFixed[0] = 0
     }
-    if (howBadPoseIs[0] > 40 && howBadPoseIs[2] > 40 && howBadPoseIs[7] > 40) {
+
+    if (howBadPoseIs[0] > reference && howBadPoseIs[2] > reference && howBadPoseIs[7] > reference) {
       // 자세 무너짐
-      charaWindow?.webContents.send('show-animation', 2)
       isFixed[1] += 1
-      if(isFixed[1] > 3){
-        // charaWindow?.webContents.send('show-animation', 5) (교정 실패)
+      if (isFixed[1] > 3) {
+        charaWindow?.webContents.send('show-animation', 5)
+      } else {
+        charaWindow?.webContents.send('show-animation', 2)
       }
-    } else{
-      if (isFixed[1] != 0){
-        //(교정 성공)
+    } else {
+      if (isFixed[1] != 0) {
+        charaWindow?.webContents.send('show-animation', 6)
       }
       isFixed[1] = 0
-      
-    } 
-    
-    if (howBadPoseIs[2] > 40 && howBadPoseIs[4] > 40) {
-      // 고개 숙임 & 집중 잃음
-      charaWindow?.webContents.send('show-animation', 3)
-      isFixed[2] += 1
-      if(isFixed[2] > 3){
-          // charaWindow?.webContents.send('show-animation', 5) (교정 실패)
-        }
-      } else{
-        if (isFixed[2] != 0){
-          //(교정 성공)
-      }isFixed[2] = 0
     }
+
+    if (howBadPoseIs[2] > reference && howBadPoseIs[4] > reference) {
+      // 고개 숙임 & 집중 잃음
+      isFixed[2] += 1
+      if (isFixed[2] > 3) {
+        charaWindow?.webContents.send('show-animation', 5)
+      } else {
+        charaWindow?.webContents.send('show-animation', 3)
+      }
+    } else {
+      if (isFixed[2] != 0) {
+        charaWindow?.webContents.send('show-animation', 6)
+      }
+      isFixed[2] = 0
+    }
+
     poseNow = newUpdateTime
     for (let i = 0; i < 9; i++) {
-      boolResult[i] = false
       howBadPoseIs[i] = 0
     }
   } else {
