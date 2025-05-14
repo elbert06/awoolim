@@ -30,6 +30,7 @@
     "@tensorflow/tfjs-backend-cpu": "^4.22.0",
     "@tensorflow/tfjs-core": "^4.22.0",
     "consola": "^3.4.2",
+    "dotenv": "^16.5.0",
     "electron-store": "^10.0.1",
     "sharp": "^0.34.1",
     "svelte-i18n": "^4.0.1",

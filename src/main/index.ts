@@ -7,6 +7,7 @@ import {
   screen,
   dialog
 } from 'electron'
+import 'dotenv/config'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { GoogleGenAI, Type } from '@google/genai'
@@ -17,6 +18,8 @@ import Store from 'electron-store'
 import consola from 'consola'
 import sharp from 'sharp'
 import icon from '../../resources/icon.png?asset'
+
+const geminiKey = process.env.GEMINI_API_KEY
 
 const store = new Store()
 let now = new Date().getTime()
@@ -304,7 +307,7 @@ async function getDataAndCommunicateWithGemini(): Promise<number> {
 }
 
 async function getSendGemini(geminiThing: string, option: number): Promise<string> {
-  const ai = new GoogleGenAI({ apiKey: 'AIzaSyAzyrPJFxwRD_uvl6rdyjYW0-NjE4MDd-g' })
+  const ai = new GoogleGenAI({ apiKey: geminiKey })
   let config = {}
   if (option == 0) {
     config = {
@@ -320,7 +323,7 @@ async function getSendGemini(geminiThing: string, option: number): Promise<strin
     }
   }
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-pro-exp-03-25',
+    model: 'gemini-2.5-flash-preview-04-17',
     config: config,
     contents: geminiThing
   })
