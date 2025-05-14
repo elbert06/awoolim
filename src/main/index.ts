@@ -491,7 +491,7 @@ async function checkIsPerson(imageBuffer: Buffer): Promise<boolean> {
 
   return hasPerson
 }
-
+// 시간 체크 함수
 async function checkTime(imageBuffer: Buffer, timeCanDo: number): Promise<void> {
   const isPerson = await checkIsPerson(imageBuffer)
   if (isPerson) {
