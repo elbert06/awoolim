@@ -25,7 +25,7 @@ let pose_now = new Date().getTime();
 let mainWindow: BrowserWindow | null = null
 let setupWindow: BrowserWindow | null = null
 let charaWindow: BrowserWindow | null = null
-
+let isChecking = true
 let userData: userData = {
   language: 'en',
   name: '',
@@ -545,8 +545,12 @@ async function checkTime(imageBuffer: Buffer, timeCanDo: number): Promise<void> 
   if (isPerson) {
     newDate = new Date().getTime()
     const timeDid = newDate - now
-    if (timeDid / 1000 >= 60 * timeCanDo) {
+    if (isChecking == false && timeDid / 1000 > 600){
+      isChecking = true
+      now = newDate
+    }else if (timeDid / 1000 >= 60 * timeCanDo) {
       charaWindow?.webContents.send('show-animation', 4)
+      isChecking = false
     }
   } else {
     now = new Date().getTime()
