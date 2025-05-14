@@ -91,10 +91,38 @@ async function createMainWindow(): Promise<void> {
   })
 }
 
+// function animTest(): void {
+//   consola.info('show-animation 1')
+//   charaWindow?.webContents.send('show-animation', 1)
+//   setTimeout(() => {
+//     consola.info('show-animation 2')
+//     charaWindow?.webContents.send('show-animation', 2)
+//   }, 10000)
+//   setTimeout(() => {
+//     consola.info('show-animation 3')
+//     charaWindow?.webContents.send('show-animation', 3)
+//   }, 20000)
+//   setTimeout(() => {
+//     consola.info('show-animation 4')
+//     charaWindow?.webContents.send('show-animation', 4)
+//   }, 30000)
+//   setTimeout(() => {
+//     consola.info('show-animation 5')
+//     charaWindow?.webContents.send('show-animation', 5)
+//   }, 40000)
+//   setTimeout(() => {
+//     consola.info('show-animation 6')
+//     charaWindow?.webContents.send('show-animation', 6)
+//   }, 50000)
+//   setTimeout(() => {
+//     animTest()
+//   }, 60000)
+// }
+
 function createCharaWindow(): void {
   const primaryDisplay = screen.getPrimaryDisplay()
   const { width, height } = primaryDisplay.workAreaSize
-  const windowWidth = 500
+  const windowWidth = width / 2
   const windowHeight = 500
   charaWindow = new BrowserWindow({
     transparent: true,
@@ -517,11 +545,10 @@ async function checkTime(imageBuffer: Buffer, timeCanDo: number): Promise<void> 
   if (isPerson) {
     newDate = new Date().getTime()
     const timeDid = newDate - now
-    if (isChecking == false && timeDid / 1000 > 600){
+    if (isChecking == false && timeDid / 1000 > 600) {
       isChecking = true
       now = newDate
-      
-    }else if (timeDid / 1000 >= 60 * timeCanDo) {
+    } else if (timeDid / 1000 >= 60 * timeCanDo) {
       charaWindow?.webContents.send('show-animation', 4)
       isChecking = false
     }

@@ -3,14 +3,18 @@
   import { DotLottie } from '@lottiefiles/dotlottie-web'
   import turtleNeckAnim from './assets/1.lottie'
   import postureWarnAnim from './assets/2.lottie'
-  // import tooCloseAnim from './assets/3.lottie'
-  // import timeAlertAnim from './assets/4.lottie'
+  import unfocusedAnim from './assets/3.lottie'
+  import timeAlertAnim from './assets/4.lottie'
+  import failureAnim from './assets/5.lottie'
+  import successAnim from './assets/6.lottie'
 
   const animations = {
     1: turtleNeckAnim,
-    2: postureWarnAnim
-    // 3: tooCloseAnim,
-    // 4: timeAlertAnim
+    2: postureWarnAnim,
+    3: unfocusedAnim,
+    4: timeAlertAnim,
+    5: failureAnim,
+    6: successAnim
   }
 
   let dotLottie: DotLottie | null = null
@@ -44,15 +48,20 @@
   })
 </script>
 
-<canvas bind:this={lottieCanvas} width="500" height="500"></canvas>
+<div id="container">
+  <canvas bind:this={lottieCanvas} width="500" height="500"></canvas>
+</div>
 
 <style>
+  #container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+  }
   canvas {
     width: 500px;
     height: 500px;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1;
   }
 </style>
