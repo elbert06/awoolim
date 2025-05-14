@@ -15,19 +15,13 @@ import * as tf from '@tensorflow/tfjs-core'
 import { loadTFLiteModel } from 'tfjs-tflite-node'
 import Store from 'electron-store'
 import consola from 'consola'
-import sharp from 'sharp'
+import sharp, { bool } from 'sharp'
 import icon from '../../resources/icon.png?asset'
 
 const store = new Store()
 let now = new Date().getTime()
 let newDate = new Date().getTime()
-let bendTime = new Date().getTime()
-let newBendTime = new Date().getTime()
-let collapseTime = new Date().getTime()
-let newCollapseTime = new Date().getTime()
-let focusTime = new Date().getTime()
-let newFocusTime = new Date().getTime()
-
+let pose_now = new Date().getTime();
 let mainWindow: BrowserWindow | null = null
 let setupWindow: BrowserWindow | null = null
 let charaWindow: BrowserWindow | null = null
@@ -40,7 +34,7 @@ let userData: userData = {
   conditions: [],
   otherConditionDetail: ''
 }
-
+let howbadposeIs = new Array(9);
 async function createMainWindow(): Promise<void> {
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -445,40 +439,56 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
     '7': 좌우기울어짐,
     '8': 화면가까움
   }
-  newBendTime = new Date().getTime()
-  newCollapseTime = new Date().getTime()
-  newFocusTime = new Date().getTime()
-  if (
-    result['3'] == true &&
-    result['4'] == true &&
-    result['8'] == true &&
-    newBendTime - bendTime > 60000 * 2
-  ) {
-    // 거북목
-    charaWindow?.webContents.send('show-animation', 1)
-  } else if (result['3'] == false || result['4'] == false || result['8'] == false) {
-    bendTime = new Date().getTime()
+  const bool_result = {
+    '0': false,
+    '1': false,
+    '2': false,
+    '3': false,
+    '4': false,
+    '5': false,
+    '6': false,
+    '7': false,
+    '8': false
   }
-
-  if (
-    result['0'] == true &&
-    result['2'] == true &&
-    result['7'] == true &&
-    newCollapseTime - collapseTime > 60000 * 2
-  ) {
-    // 자세 무너짐
-    charaWindow?.webContents.send('show-animation', 2)
-  } else if (result['0'] == false || result['2'] == false || result['7'] == false) {
-    collapseTime = new Date().getTime()
+  let newUpdateTime = new Date().getTime()
+  if (newUpdateTime - pose_now > 60*1000){
+    for(let i = 0; i < 12; i++){
+      if (howbadposeIs[i] > 40){
+        bool_result[i] = true;
+      }
+    }
+    if (
+      bool_result['3'] == true &&
+      bool_result['4'] == true &&
+      bool_result['8'] == true) {
+      // 거북목
+      charaWindow?.webContents.send('show-animation', 1)
+    } 
+    if (
+      bool_result['0'] == true &&
+      bool_result['2'] == true &&
+      bool_result['7'] == true
+      ) {
+      // 자세 무너짐
+      charaWindow?.webContents.send('show-animation', 2)
+    } 
+    if (bool_result['2'] == true && bool_result['4'] == true) {
+      // 화면에 너무 가까움
+      charaWindow?.webContents.send('show-animation', 3)
+    } 
+    pose_now = newUpdateTime;
+    for(let i = 0; i < 12; i++){
+      bool_result[i] = false;
+      howbadposeIs[i] = 0;
+    }
+  }else{
+    for(let i = 0; i < 12; i++){
+      if (result[i] == 1){
+        howbadposeIs[i] += 1;
+      }
+    }
   }
-
-  if (result['2'] == true && result['4'] == true && newFocusTime - focusTime > 60000 * 2) {
-    // 화면에 너무 가까움
-    charaWindow?.webContents.send('show-animation', 3)
-  } else if (result['2'] == false || result['4'] == false) {
-    focusTime = new Date().getTime()
-  }
-
+  
   // consola.log(getSendGemini('give one sentence advice with this json skeleton file. this array result means\
   //   const result = {\
   //   "0": "Neck Tilt"\
