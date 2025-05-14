@@ -15,7 +15,7 @@ import * as tf from '@tensorflow/tfjs-core'
 import { loadTFLiteModel } from 'tfjs-tflite-node'
 import Store from 'electron-store'
 import consola from 'consola'
-import sharp, { bool } from 'sharp'
+import sharp from 'sharp'
 import icon from '../../resources/icon.png?asset'
 
 const store = new Store()
@@ -35,6 +35,9 @@ let userData: userData = {
   otherConditionDetail: ''
 }
 let howbadposeIs = new Array(9);
+for(let i = 0; i < 12; i++){
+  howbadposeIs[i] = 0;
+}
 async function createMainWindow(): Promise<void> {
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -391,7 +394,7 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
   const leftWrist = keypoints[9]
   const rightWrist = keypoints[10]
   const leftHip = keypoints[11]
-  const rightHip = keypoints[12]
+  const rightHip = keypoints[9]
 
   // 0: 목 기울어짐 (코가 어깨 중심선에서 벗어남)
   const shoulderCenterX = getAvg(leftShoulder.x, rightShoulder.x)
@@ -452,7 +455,7 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
   }
   let newUpdateTime = new Date().getTime()
   if (newUpdateTime - pose_now > 60*1000){
-    for(let i = 0; i < 12; i++){
+    for(let i = 0; i < 9; i++){
       if (howbadposeIs[i] > 40){
         bool_result[i] = true;
       }
@@ -477,12 +480,12 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
       charaWindow?.webContents.send('show-animation', 3)
     } 
     pose_now = newUpdateTime;
-    for(let i = 0; i < 12; i++){
+    for(let i = 0; i < 9; i++){
       bool_result[i] = false;
       howbadposeIs[i] = 0;
     }
   }else{
-    for(let i = 0; i < 12; i++){
+    for(let i = 0; i < 9; i++){
       if (result[i] == 1){
         howbadposeIs[i] += 1;
       }
