@@ -21,7 +21,7 @@ import icon from '../../resources/icon.png?asset'
 const store = new Store()
 let now = new Date().getTime()
 let newDate = new Date().getTime()
-let pose_now = new Date().getTime();
+let poseNow = new Date().getTime()
 let mainWindow: BrowserWindow | null = null
 let setupWindow: BrowserWindow | null = null
 let charaWindow: BrowserWindow | null = null
@@ -34,10 +34,7 @@ let userData: userData = {
   conditions: [],
   otherConditionDetail: ''
 }
-let howbadposeIs = new Array(9);
-for(let i = 0; i < 12; i++){
-  howbadposeIs[i] = 0;
-}
+const howBadPoseIs = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 async function createMainWindow(): Promise<void> {
   // Create the browser window.
   mainWindow = new BrowserWindow({
@@ -394,7 +391,7 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
   const leftWrist = keypoints[9]
   const rightWrist = keypoints[10]
   const leftHip = keypoints[11]
-  const rightHip = keypoints[9]
+  const rightHip = keypoints[12]
 
   // 0: 목 기울어짐 (코가 어깨 중심선에서 벗어남)
   const shoulderCenterX = getAvg(leftShoulder.x, rightShoulder.x)
@@ -442,56 +439,48 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
     '7': 좌우기울어짐,
     '8': 화면가까움
   }
-  const bool_result = {
-    '0': false,
-    '1': false,
-    '2': false,
-    '3': false,
-    '4': false,
-    '5': false,
-    '6': false,
-    '7': false,
-    '8': false
-  }
-  let newUpdateTime = new Date().getTime()
-  if (newUpdateTime - pose_now > 60*1000){
-    for(let i = 0; i < 9; i++){
-      if (howbadposeIs[i] > 40){
-        bool_result[i] = true;
+  const newUpdateTime = new Date().getTime()
+  if (newUpdateTime - poseNow > 60 * 1000) {
+    const boolResult = {
+      '0': false,
+      '1': false,
+      '2': false,
+      '3': false,
+      '4': false,
+      '5': false,
+      '6': false,
+      '7': false,
+      '8': false
+    }
+    for (let i = 0; i < 9; i++) {
+      if (howBadPoseIs[i] > 40) {
+        boolResult[i] = true
       }
     }
-    if (
-      bool_result['3'] == true &&
-      bool_result['4'] == true &&
-      bool_result['8'] == true) {
+    // 애니메이션은 1개만 재생 되도록
+    if (howBadPoseIs[3] > 40 && howBadPoseIs[4] > 40 && howBadPoseIs[8] > 40) {
       // 거북목
       charaWindow?.webContents.send('show-animation', 1)
-    } 
-    if (
-      bool_result['0'] == true &&
-      bool_result['2'] == true &&
-      bool_result['7'] == true
-      ) {
+    } else if (howBadPoseIs[0] > 40 && howBadPoseIs[2] > 40 && howBadPoseIs[7] > 40) {
       // 자세 무너짐
       charaWindow?.webContents.send('show-animation', 2)
-    } 
-    if (bool_result['2'] == true && bool_result['4'] == true) {
+    } else if (howBadPoseIs[2] > 40 && howBadPoseIs[4] > 40) {
       // 화면에 너무 가까움
       charaWindow?.webContents.send('show-animation', 3)
-    } 
-    pose_now = newUpdateTime;
-    for(let i = 0; i < 9; i++){
-      bool_result[i] = false;
-      howbadposeIs[i] = 0;
     }
-  }else{
-    for(let i = 0; i < 9; i++){
-      if (result[i] == 1){
-        howbadposeIs[i] += 1;
+    poseNow = newUpdateTime
+    for (let i = 0; i < 9; i++) {
+      boolResult[i] = false
+      howBadPoseIs[i] = 0
+    }
+  } else {
+    for (let i = 0; i < 9; i++) {
+      if (result[i] == 1) {
+        howBadPoseIs[i] += 1
       }
     }
   }
-  
+
   // consola.log(getSendGemini('give one sentence advice with this json skeleton file. this array result means\
   //   const result = {\
   //   "0": "Neck Tilt"\
