@@ -5,7 +5,9 @@ import {
   IpcMainEvent,
   systemPreferences,
   screen,
-  dialog
+  dialog,
+  Menu,
+  Tray
 } from 'electron'
 import 'dotenv/config'
 import { join } from 'path'
@@ -21,13 +23,15 @@ import icon from '../../resources/icon.png?asset'
 
 const geminiKey = process.env.GEMINI_API_KEY
 
+let mainWindow: BrowserWindow | null = null
+let setupWindow: BrowserWindow | null = null
+let charaWindow: BrowserWindow | null = null
+let tray: Tray | null = null
+
 const store = new Store()
 let now = new Date().getTime()
 let newDate = new Date().getTime()
 let poseNow = new Date().getTime()
-let mainWindow: BrowserWindow | null = null
-let setupWindow: BrowserWindow | null = null
-let charaWindow: BrowserWindow | null = null
 let isChecking = true
 const isFixed = [0, 0, 0]
 let userData: userData = {
@@ -39,6 +43,7 @@ let userData: userData = {
   otherConditionDetail: ''
 }
 const howBadPoseIs = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+
 async function createMainWindow(): Promise<void> {
   mainWindow = new BrowserWindow({
     width: 500,
@@ -78,8 +83,8 @@ async function createMainWindow(): Promise<void> {
       'Initializing webcam failed',
       'Webcam is not available.\nPlease check your webcam or permission settings.\n\nApplication will be terminated.'
     )
-    consola.error('Initializing webcam failed, terminating application')
-    app.quit()
+    // consola.error('Initializing webcam failed, terminating application')
+    // app.quit()
   })
 
   consola.start('Getting data from Gemini...\nProgram will be started after getting data')
@@ -169,6 +174,11 @@ app.whenReady().then(async () => {
   consola.info('OS architecture:', process.arch)
 
   electronApp.setAppUserModelId('com.awoolim.app')
+
+  tray = new Tray(icon)
+  const contextMenu = Menu.buildFromTemplate([{ label: 'Exit', role: 'quit' }])
+  tray.setToolTip('Awoolim')
+  tray.setContextMenu(contextMenu)
 
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
