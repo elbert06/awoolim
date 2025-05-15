@@ -1,9 +1,11 @@
 <script lang="ts">
-  import { waitLocale, _ } from 'svelte-i18n'
+  import { locale, waitLocale, _ } from 'svelte-i18n'
   import { DotLottie } from '@lottiefiles/dotlottie-web'
   import globeIcon from './assets/globe.svg'
   import loadingAnim from './assets/loading.lottie'
   import { onMount } from 'svelte'
+
+  const locales = ['en', 'ko']
 
   let dotLottie
   let conditions = []
@@ -24,29 +26,7 @@
   }
 
   waitLocale().then(() => {
-    title = [
-      $_('setup.permission.title'),
-      $_('setup.welcome.title'),
-      $_('setup.username.title'),
-      $_('setup.basics.title'),
-      $_('setup.details.title'),
-      $_('setup.complete.title')
-    ]
-    description = [
-      $_('setup.permission.description'),
-      $_('setup.welcome.description'),
-      $_('setup.username.description'),
-      $_('setup.basics.description'),
-      $_('setup.details.description'),
-      $_('setup.complete.description')
-    ]
-    conditions = [
-      { value: 'neck_disc', label: $_('setup.details.neck_disc') },
-      { value: 'forward_head', label: $_('setup.details.forward_head') },
-      { value: 'back_pain', label: $_('setup.details.back_pain') },
-      { value: 'shoulder_pain', label: $_('setup.details.shoulder_pain') },
-      { value: 'other', label: $_('setup.details.other') }
-    ]
+    locale.subscribe(initializeLocale)
     window.electron.ipcRenderer.send('get-permission-state')
   })
 
@@ -81,6 +61,38 @@
     window.electron.ipcRenderer.send('setup-complete', userData)
   }
 
+  const initializeLocale = (): void => {
+    title = [
+      $_('setup.permission.title'),
+      $_('setup.welcome.title'),
+      $_('setup.username.title'),
+      $_('setup.basics.title'),
+      $_('setup.details.title'),
+      $_('setup.complete.title')
+    ]
+    description = [
+      $_('setup.permission.description'),
+      $_('setup.welcome.description'),
+      $_('setup.username.description'),
+      $_('setup.basics.description'),
+      $_('setup.details.description'),
+      $_('setup.complete.description')
+    ]
+    conditions = [
+      { value: 'neck_disc', label: $_('setup.details.neck_disc') },
+      { value: 'forward_head', label: $_('setup.details.forward_head') },
+      { value: 'back_pain', label: $_('setup.details.back_pain') },
+      { value: 'shoulder_pain', label: $_('setup.details.shoulder_pain') },
+      { value: 'other', label: $_('setup.details.other') }
+    ]
+  }
+
+  const langChange = (): void => {
+    const currentIndex = locales.indexOf($locale)
+    const nextIndex = (currentIndex + 1) % locales.length
+    locale.set(locales[nextIndex])
+  }
+
   window.electron.ipcRenderer.on('permission-state', (_event, state) => {
     if (state === 'granted') {
       loadingCanvas.style.opacity = 0
@@ -110,10 +122,11 @@
 
 <div id="container">
   {#if screen >= 0}
-    <div id="languageDisplay">
+    <!-- svelte-ignore a11y_invalid_attribute -->
+    <button id="languageDisplay" on:click={langChange}>
       <img src={globeIcon} alt="Language" />
       <span>{$_('language')}</span>
-    </div>
+    </button>
     <div id="contentContainer" class="noblur" bind:this={contentContainer}>
       <div id="information">
         <h1>{title[screen]}</h1>
@@ -287,10 +300,17 @@
     font-size: 0.8em;
     color: rgba(var(--text-color), 0.5);
     border: 1px solid rgba(var(--text-color), 0.5);
+    background-color: rgba(var(--text-color), 0);
     height: 34px;
     padding: 0 10px 0 7px;
     border-radius: 17px;
     transition: background-color 0.3s ease;
+    cursor: pointer;
+  }
+
+  #languageDisplay > img,
+  #languageDisplay > span {
+    cursor: pointer;
   }
 
   #languageDisplay:hover {
