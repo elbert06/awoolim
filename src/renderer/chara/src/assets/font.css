@@ -1,0 +1,15 @@
+@font-face {
+  font-family: 'Playwrite DE SAS';
+  font-style: normal;
+  font-weight: 100 400;
+  font-display: swap;
+  src: url('./playwrite.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Pretendard Std Variable';
+  font-weight: 45 920;
+  font-style: normal;
+  font-display: swap;
+  src: url('./PretendardStdVariable.woff2') format('woff2-variations');
+}

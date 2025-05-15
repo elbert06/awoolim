@@ -94,34 +94,6 @@ async function createMainWindow(): Promise<void> {
   })
 }
 
-// function animTest(): void {
-//   consola.info('show-animation 1')
-//   charaWindow?.webContents.send('show-animation', 1)
-//   setTimeout(() => {
-//     consola.info('show-animation 2')
-//     charaWindow?.webContents.send('show-animation', 2)
-//   }, 10000)
-//   setTimeout(() => {
-//     consola.info('show-animation 3')
-//     charaWindow?.webContents.send('show-animation', 3)
-//   }, 20000)
-//   setTimeout(() => {
-//     consola.info('show-animation 4')
-//     charaWindow?.webContents.send('show-animation', 4)
-//   }, 30000)
-//   setTimeout(() => {
-//     consola.info('show-animation 5')
-//     charaWindow?.webContents.send('show-animation', 5)
-//   }, 40000)
-//   setTimeout(() => {
-//     consola.info('show-animation 6')
-//     charaWindow?.webContents.send('show-animation', 6)
-//   }, 50000)
-//   setTimeout(() => {
-//     animTest()
-//   }, 60000)
-// }
-
 function createCharaWindow(): void {
   const primaryDisplay = screen.getPrimaryDisplay()
   const { width, height } = primaryDisplay.workAreaSize
@@ -355,7 +327,7 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
   // console.log(heatmapTensor.shape)
   // console.log(heatmapTensor instanceof tf.Tensor); // true여야 함
 
-  const transposed = tf.transpose(heatmapTensor, [0, 2, 3, 1]);
+  const transposed = tf.transpose(heatmapTensor, [0, 2, 3, 1])
   const heatmapArray = await transposed.array()
 
   const [, numKeypoints, h, w] = transposed.shape
@@ -462,13 +434,22 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
       // 거북목
       isFixed[0] += 1
       if (isFixed[0] > 3) {
-        charaWindow?.webContents.send('show-animation', 5)
+        charaWindow?.webContents.send('show-animation', {
+          id: 5,
+          data: '여기에 자연어 피드백 입력'
+        })
       } else {
-        charaWindow?.webContents.send('show-animation', 1)
+        charaWindow?.webContents.send('show-animation', {
+          id: 1,
+          data: '여기에 자연어 피드백 입력'
+        })
       }
     } else {
       if (isFixed[0] != 0) {
-        charaWindow?.webContents.send('show-animation', 6)
+        charaWindow?.webContents.send('show-animation', {
+          id: 6,
+          data: '여기에 자연어 피드백 입력'
+        })
       }
       isFixed[0] = 0
     }
@@ -477,13 +458,22 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
       // 자세 무너짐
       isFixed[1] += 1
       if (isFixed[1] > 3) {
-        charaWindow?.webContents.send('show-animation', 5)
+        charaWindow?.webContents.send('show-animation', {
+          id: 5,
+          data: '여기에 자연어 피드백 입력'
+        })
       } else {
-        charaWindow?.webContents.send('show-animation', 2)
+        charaWindow?.webContents.send('show-animation', {
+          id: 2,
+          data: '여기에 자연어 피드백 입력'
+        })
       }
     } else {
       if (isFixed[1] != 0) {
-        charaWindow?.webContents.send('show-animation', 6)
+        charaWindow?.webContents.send('show-animation', {
+          id: 6,
+          data: '여기에 자연어 피드백 입력'
+        })
       }
       isFixed[1] = 0
     }
@@ -492,13 +482,22 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
       // 고개 숙임 & 집중 잃음
       isFixed[2] += 1
       if (isFixed[2] > 3) {
-        charaWindow?.webContents.send('show-animation', 5)
+        charaWindow?.webContents.send('show-animation', {
+          id: 5,
+          data: '여기에 자연어 피드백 입력'
+        })
       } else {
-        charaWindow?.webContents.send('show-animation', 3)
+        charaWindow?.webContents.send('show-animation', {
+          id: 3,
+          data: '여기에 자연어 피드백 입력'
+        })
       }
     } else {
       if (isFixed[2] != 0) {
-        charaWindow?.webContents.send('show-animation', 6)
+        charaWindow?.webContents.send('show-animation', {
+          id: 6,
+          data: '여기에 자연어 피드백 입력'
+        })
       }
       isFixed[2] = 0
     }
@@ -555,7 +554,10 @@ async function checkTime(imageBuffer: Buffer, timeCanDo: number): Promise<void> 
       isChecking = true
       now = newDate
     } else if (timeDid / 1000 >= 60 * timeCanDo) {
-      charaWindow?.webContents.send('show-animation', 4)
+      charaWindow?.webContents.send('show-animation', {
+        id: 4,
+        data: '여기에 자연어 피드백 입력'
+      })
       isChecking = false
     }
   } else {
