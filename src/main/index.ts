@@ -276,7 +276,7 @@ async function getDataAndCommunicateWithGemini(): Promise<number> {
   this person has these diseases : ' +
     userData.conditions.join(', ') +
     '\
-  this person is developer, and this person work. \
+  this person working on the desk. this person have to rest regularly.\
   Tell me how much time we have to work per resting 10 minutes'
   const sendGemini = await getSendGemini(sendScript, 0)
   if (sendGemini == undefined) {
@@ -286,6 +286,18 @@ async function getDataAndCommunicateWithGemini(): Promise<number> {
   const result = JSON.parse(sendGemini)
 
   return parseInt(result['result'])
+}
+
+async function getAdvicewithGemini(AdviceScript : string): Promise<string> {
+  const sendScript = AdviceScript;
+  const sendGemini = await getSendGemini(sendScript, 0)
+  if (sendGemini == undefined) {
+    consola.error('Gemini response is undefined')
+    return "wrong response"
+  }
+  const result = JSON.parse(sendGemini)
+
+  return result['result']
 }
 
 async function getSendGemini(geminiThing: string, option: number): Promise<string> {
@@ -446,19 +458,25 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
       if (isFixed[0] > 3) {
         charaWindow?.webContents.send('show-animation', {
           id: 5,
-          data: '여기에 자연어 피드백 입력'
+          data: getAdvicewithGemini('The user has been warned that their posture\
+            could lead to misalignment, yet they continue to maintain it.\
+            Please firmly tell them that maintaining a forward head posture (text neck) can lead to serious negative consequences,\
+            and they must correct it immediately.')
         })
       } else {
         charaWindow?.webContents.send('show-animation', {
           id: 1,
-          data: '여기에 자연어 피드백 입력'
+          data: getAdvicewithGemini('The user is currently maintaining a posture that can lead to poor alignment.\
+             Please let them know that this could result in bad posture over time, and they should correct it')
         })
       }
     } else {
       if (isFixed[0] != 0) {
         charaWindow?.webContents.send('show-animation', {
           id: 6,
-          data: '여기에 자연어 피드백 입력'
+          data: getAdvicewithGemini('I updated the feedback to say they have forward head posture and should fix it.\
+            Can you give a polite compliment to the person who corrected their posture,\
+            and also mention why tech neck is bad?')
         })
       }
       isFixed[0] = 0
@@ -470,19 +488,25 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
       if (isFixed[1] > 3) {
         charaWindow?.webContents.send('show-animation', {
           id: 5,
-          data: '여기에 자연어 피드백 입력'
+          data: getAdvicewithGemini('The user has been warned that their posture\
+            could lead to misalignment, yet they continue to maintain it.\
+            Please firmly tell them that maintaining a forward Posture breakdown can lead to serious negative consequences,\
+            and they must correct it immediately.')
         })
       } else {
         charaWindow?.webContents.send('show-animation', {
           id: 2,
-          data: '여기에 자연어 피드백 입력'
+          data: getAdvicewithGemini('The user is currently maintaining a posture that can lead to posture breakdown.\
+             Please let them know that this could result in bad posture over time, and they should correct it')
         })
       }
     } else {
       if (isFixed[1] != 0) {
         charaWindow?.webContents.send('show-animation', {
           id: 6,
-          data: '여기에 자연어 피드백 입력'
+          data: getAdvicewithGemini('I updated the feedback to say they have forward head posture and should fix it.\
+            Can you give a polite compliment to the person who corrected their posture,\
+            and also mention why posture breakdown is bad?')
         })
       }
       isFixed[1] = 0
@@ -494,19 +518,25 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
       if (isFixed[2] > 3) {
         charaWindow?.webContents.send('show-animation', {
           id: 5,
-          data: '여기에 자연어 피드백 입력'
+          data: getAdvicewithGemini('The user has been warned that their posture\
+            could lead to misalignment, yet they continue to maintain it.\
+            Please firmly tell them that maintaining a forward losing focus and head tilt forward can lead to serious negative consequences,\
+            and they must correct it immediately.')
         })
       } else {
         charaWindow?.webContents.send('show-animation', {
           id: 3,
-          data: '여기에 자연어 피드백 입력'
+          data: getAdvicewithGemini('The user is currently maintaining a posture that can lead to losing focus and head tilt.\
+             Please let them know that this could result in bad posture over time, and they should correct it')
         })
       }
     } else {
       if (isFixed[2] != 0) {
         charaWindow?.webContents.send('show-animation', {
           id: 6,
-          data: '여기에 자연어 피드백 입력'
+          data: getAdvicewithGemini('I updated the feedback to say they have forward head posture and should fix it.\
+            Can you give a polite compliment to the person who corrected their posture,\
+            and also mention why posture losing focus and head tilt is bad?')
         })
       }
       isFixed[2] = 0
@@ -566,7 +596,7 @@ async function checkTime(imageBuffer: Buffer, timeCanDo: number): Promise<void> 
     } else if (timeDid / 1000 >= 60 * timeCanDo) {
       charaWindow?.webContents.send('show-animation', {
         id: 4,
-        data: '여기에 자연어 피드백 입력'
+        data: ''
       })
       isChecking = false
     }
