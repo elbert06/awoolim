@@ -352,7 +352,10 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
   const output = model.predict(input)
   // @ts-ignore "This error is caused by the version difference of tfjs and tfjs-tflite-node"
   const heatmapTensor = output.float_heatmaps
-  const transposed = heatmapTensor.transpose([0, 3, 1, 2])
+  // console.log(heatmapTensor.shape)
+  // console.log(heatmapTensor instanceof tf.Tensor); // true여야 함
+
+  const transposed = tf.transpose(heatmapTensor, [0, 2, 3, 1]);
   const heatmapArray = await transposed.array()
 
   const [, numKeypoints, h, w] = transposed.shape
