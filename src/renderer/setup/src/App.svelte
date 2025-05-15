@@ -411,6 +411,7 @@
   }
 
   select > option {
-    color: rgb(var(--background-color));
+    background-color: rgba(var(--background-color), 0.8);
+    color: rgb(var(--text-color));
   }
 </style>

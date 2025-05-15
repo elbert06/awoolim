@@ -83,8 +83,8 @@ async function createMainWindow(): Promise<void> {
       'Initializing webcam failed',
       'Webcam is not available.\nPlease check your webcam or permission settings.\n\nApplication will be terminated.'
     )
-    // consola.error('Initializing webcam failed, terminating application')
-    // app.quit()
+    consola.error('Initializing webcam failed, terminating application')
+    app.quit()
   })
 
   consola.start('Getting data from Gemini...\nProgram will be started after getting data')
