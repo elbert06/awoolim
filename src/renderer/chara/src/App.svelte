@@ -59,7 +59,8 @@
 
 <div id="container">
   <div id="dialog" class={show ? 'show' : ''}>
-    <span>{message}</span>
+    <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+    <span>{@html message}</span>
   </div>
   <canvas bind:this={lottieCanvas} class={show ? 'show' : ''} width="500" height="500"> </canvas>
 </div>
