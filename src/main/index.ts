@@ -288,12 +288,12 @@ async function getDataAndCommunicateWithGemini(): Promise<number> {
   return parseInt(result['result'])
 }
 
-async function getAdvicewithGemini(AdviceScript : string): Promise<string> {
-  const sendScript = AdviceScript;
+async function getAdvicewithGemini(AdviceScript: string): Promise<string> {
+  const sendScript = AdviceScript
   const sendGemini = await getSendGemini(sendScript, 0)
   if (sendGemini == undefined) {
     consola.error('Gemini response is undefined')
-    return "wrong response"
+    return 'wrong response'
   }
   const result = JSON.parse(sendGemini)
 
@@ -458,25 +458,31 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
       if (isFixed[0] > 3) {
         charaWindow?.webContents.send('show-animation', {
           id: 5,
-          data: getAdvicewithGemini('The user has been warned that their posture\
+          data: getAdvicewithGemini(
+            'The user has been warned that their posture\
             could lead to misalignment, yet they continue to maintain it.\
             Please firmly tell them that maintaining a forward head posture (text neck) can lead to serious negative consequences,\
-            and they must correct it immediately.')
+            and they must correct it immediately.'
+          )
         })
       } else {
         charaWindow?.webContents.send('show-animation', {
           id: 1,
-          data: getAdvicewithGemini('The user is currently maintaining a posture that can lead to poor alignment.\
-             Please let them know that this could result in bad posture over time, and they should correct it')
+          data: getAdvicewithGemini(
+            'The user is currently maintaining a posture that can lead to poor alignment.\
+             Please let them know that this could result in bad posture over time, and they should correct it'
+          )
         })
       }
     } else {
       if (isFixed[0] != 0) {
         charaWindow?.webContents.send('show-animation', {
           id: 6,
-          data: getAdvicewithGemini('I updated the feedback to say they have forward head posture and should fix it.\
+          data: getAdvicewithGemini(
+            'I updated the feedback to say they have forward head posture and should fix it.\
             Can you give a polite compliment to the person who corrected their posture,\
-            and also mention why tech neck is bad?')
+            and also mention why tech neck is bad?'
+          )
         })
       }
       isFixed[0] = 0
@@ -488,25 +494,31 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
       if (isFixed[1] > 3) {
         charaWindow?.webContents.send('show-animation', {
           id: 5,
-          data: getAdvicewithGemini('The user has been warned that their posture\
+          data: getAdvicewithGemini(
+            'The user has been warned that their posture\
             could lead to misalignment, yet they continue to maintain it.\
             Please firmly tell them that maintaining a forward Posture breakdown can lead to serious negative consequences,\
-            and they must correct it immediately.')
+            and they must correct it immediately.'
+          )
         })
       } else {
         charaWindow?.webContents.send('show-animation', {
           id: 2,
-          data: getAdvicewithGemini('The user is currently maintaining a posture that can lead to posture breakdown.\
-             Please let them know that this could result in bad posture over time, and they should correct it')
+          data: getAdvicewithGemini(
+            'The user is currently maintaining a posture that can lead to posture breakdown.\
+             Please let them know that this could result in bad posture over time, and they should correct it'
+          )
         })
       }
     } else {
       if (isFixed[1] != 0) {
         charaWindow?.webContents.send('show-animation', {
           id: 6,
-          data: getAdvicewithGemini('I updated the feedback to say they have forward head posture and should fix it.\
+          data: getAdvicewithGemini(
+            'I updated the feedback to say they have forward head posture and should fix it.\
             Can you give a polite compliment to the person who corrected their posture,\
-            and also mention why posture breakdown is bad?')
+            and also mention why posture breakdown is bad?'
+          )
         })
       }
       isFixed[1] = 0
@@ -518,25 +530,31 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
       if (isFixed[2] > 3) {
         charaWindow?.webContents.send('show-animation', {
           id: 5,
-          data: getAdvicewithGemini('The user has been warned that their posture\
+          data: getAdvicewithGemini(
+            'The user has been warned that their posture\
             could lead to misalignment, yet they continue to maintain it.\
             Please firmly tell them that maintaining a forward losing focus and head tilt forward can lead to serious negative consequences,\
-            and they must correct it immediately.')
+            and they must correct it immediately.'
+          )
         })
       } else {
         charaWindow?.webContents.send('show-animation', {
           id: 3,
-          data: getAdvicewithGemini('The user is currently maintaining a posture that can lead to losing focus and head tilt.\
-             Please let them know that this could result in bad posture over time, and they should correct it')
+          data: getAdvicewithGemini(
+            'The user is currently maintaining a posture that can lead to losing focus and head tilt.\
+             Please let them know that this could result in bad posture over time, and they should correct it'
+          )
         })
       }
     } else {
       if (isFixed[2] != 0) {
         charaWindow?.webContents.send('show-animation', {
           id: 6,
-          data: getAdvicewithGemini('I updated the feedback to say they have forward head posture and should fix it.\
+          data: getAdvicewithGemini(
+            'I updated the feedback to say they have forward head posture and should fix it.\
             Can you give a polite compliment to the person who corrected their posture,\
-            and also mention why posture losing focus and head tilt is bad?')
+            and also mention why posture losing focus and head tilt is bad?'
+          )
         })
       }
       isFixed[2] = 0
