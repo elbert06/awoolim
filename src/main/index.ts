@@ -388,6 +388,8 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
     })
   }
 
+  consola.info('Keypoints:', keypoints)
+
   const getAvg = (...values: number[]): number => {
     return values.reduce((a, b) => a + b) / values.length
   }
@@ -456,9 +458,12 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
   if (newUpdateTime - poseNow > 60 * 1000) {
     const reference = 40 // 판단기준 (1초에 40회)
 
+    let animationDisplaying = false
+
     if (howBadPoseIs[3] > reference && howBadPoseIs[4] > reference && howBadPoseIs[8] > reference) {
       // 거북목
       isFixed[0] += 1
+      animationDisplaying = true
       if (isFixed[0] > 3) {
         const advice = await getAdvicewithGemini(
           'The user has been warned that their posture\
@@ -485,6 +490,7 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
       }
     } else {
       if (isFixed[0] != 0) {
+        animationDisplaying = true
         const advice = await getAdvicewithGemini(
           'Can you give a polite compliment to the person who corrected their posture,\
             and also mention why turtle neck is bad?' + fyi()
@@ -500,33 +506,37 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
 
     if (howBadPoseIs[0] > reference && howBadPoseIs[2] > reference && howBadPoseIs[7] > reference) {
       // 자세 무너짐
-      isFixed[1] += 1
-      if (isFixed[1] > 3) {
-        const advice = await getAdvicewithGemini(
-          'The user has been warned that their posture\
+      if (!animationDisplaying) {
+        isFixed[1] += 1
+        animationDisplaying = true
+        if (isFixed[1] > 3) {
+          const advice = await getAdvicewithGemini(
+            'The user has been warned that their posture\
             could lead to misalignment, yet they continue to maintain it.\
             Please firmly tell them that maintaining a forward head posture (text neck) can lead to serious negative consequences,\
             and they must correct it immediately.' + fyi()
-        )
+          )
 
-        charaWindow?.webContents.send('show-animation', {
-          id: 5,
-          message: advice
-        })
-      } else {
-        const advice = await getAdvicewithGemini(
-          'The user is currently maintaining a posture that can lead to posture breakdown.\
+          charaWindow?.webContents.send('show-animation', {
+            id: 5,
+            message: advice
+          })
+        } else {
+          const advice = await getAdvicewithGemini(
+            'The user is currently maintaining a posture that can lead to posture breakdown.\
              Please let them know that this could result in bad posture over time, and they should correct it' +
-            fyi()
-        )
+              fyi()
+          )
 
-        charaWindow?.webContents.send('show-animation', {
-          id: 2,
-          message: advice
-        })
+          charaWindow?.webContents.send('show-animation', {
+            id: 2,
+            message: advice
+          })
+        }
       }
     } else {
-      if (isFixed[1] != 0) {
+      if (isFixed[1] != 0 && !animationDisplaying) {
+        animationDisplaying = true
         const advice = await getAdvicewithGemini(
           'Can you give a polite compliment to the person who corrected their posture,\
             and also mention why posture breakdown is bad?' + fyi()
@@ -542,33 +552,36 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
 
     if (howBadPoseIs[2] > reference && howBadPoseIs[4] > reference) {
       // 고개 숙임 & 집중 잃음
-      isFixed[2] += 1
-      if (isFixed[2] > 3) {
-        const advice = await getAdvicewithGemini(
-          'The user has been warned that their posture\
+      if (!animationDisplaying) {
+        isFixed[2] += 1
+        if (isFixed[2] > 3) {
+          const advice = await getAdvicewithGemini(
+            'The user has been warned that their posture\
             could lead to misalignment, yet they continue to maintain it.\
             Please firmly tell them that maintaining a forward head posture (text neck) can lead to serious negative consequences,\
             and they must correct it immediately.' + fyi()
-        )
+          )
 
-        charaWindow?.webContents.send('show-animation', {
-          id: 5,
-          message: advice
-        })
-      } else {
-        const advice = await getAdvicewithGemini(
-          'The user is currently maintaining a posture that can lead to losing focus and head tilt.\
+          charaWindow?.webContents.send('show-animation', {
+            id: 5,
+            message: advice
+          })
+        } else {
+          const advice = await getAdvicewithGemini(
+            'The user is currently maintaining a posture that can lead to losing focus and head tilt.\
              Please let them know that this could result in bad posture over time, and they should correct it' +
-            fyi()
-        )
+              fyi()
+          )
 
-        charaWindow?.webContents.send('show-animation', {
-          id: 3,
-          message: advice
-        })
+          charaWindow?.webContents.send('show-animation', {
+            id: 3,
+            message: advice
+          })
+        }
       }
     } else {
-      if (isFixed[2] != 0) {
+      if (isFixed[2] != 0 && !animationDisplaying) {
+        animationDisplaying = true
         const advice = await getAdvicewithGemini(
           'Can you give a polite compliment to the person who corrected their posture,\
             and also mention why posture losing focus and head tilt is bad?' + fyi()
