@@ -184,15 +184,15 @@ app.whenReady().then(async () => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  if (store.get('userData') == undefined) {
-    consola.warn('User data not found, creating setup window')
-    createSetupWindow()
-  } else {
-    consola.success('User data found, loading user data')
-    userData = (await store.get('userData')) as userData
-    consola.debug('User data loaded:', userData)
-    createMainWindow()
-  }
+  // if (store.get('userData') == undefined) {
+  //   consola.warn('User data not found, creating setup window')
+  createSetupWindow()
+  // } else {
+  //   consola.success('User data found, loading user data')
+  //   userData = (await store.get('userData')) as userData
+  //   consola.debug('User data loaded:', userData)
+  //   createMainWindow()
+  // }
 })
 
 app.on('window-all-closed', () => {
@@ -456,6 +456,8 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
   }
   const newUpdateTime = new Date().getTime()
   if (newUpdateTime - poseNow > 60 * 1000) {
+    poseNow = newUpdateTime
+
     const reference = 40 // 판단기준 (1초에 40회)
 
     let animationDisplaying = false
@@ -595,7 +597,6 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
       isFixed[2] = 0
     }
 
-    poseNow = newUpdateTime
     for (let i = 0; i < 9; i++) {
       howBadPoseIs[i] = 0
     }
