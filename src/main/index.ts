@@ -388,8 +388,6 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
     })
   }
 
-  consola.info('Keypoints:', keypoints)
-
   const getAvg = (...values: number[]): number => {
     return values.reduce((a, b) => a + b) / values.length
   }
