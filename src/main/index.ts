@@ -271,7 +271,9 @@ function fyi(): string {
           gender is ${userData.gender},\
           ${userData.conditions.length > 0 ? `this person has these diseases : ${userData.conditions.join(', ')},` : ''}\
           ${userData.otherConditionDetail != '' ? `and this person's other conditions are theses : ${userData.otherConditionDetail}` : ''}\
-          to make sure this person can understand the message, please use the language code ${userData.language}\
+          to make sure this person can understand the message, please use the language code ${userData.language}.\
+          Don't add anything else, give me your advice right away.\
+          Please give me two lines of advice.
           `
 }
 
