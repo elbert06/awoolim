@@ -184,15 +184,15 @@ app.whenReady().then(async () => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // if (store.get('userData') == undefined) {
-  //   consola.warn('User data not found, creating setup window')
-  createSetupWindow()
-  // } else {
-  //   consola.success('User data found, loading user data')
-  //   userData = (await store.get('userData')) as userData
-  //   consola.debug('User data loaded:', userData)
-  //   createMainWindow()
-  // }
+  if (store.get('userData') == undefined) {
+    consola.warn('User data not found, creating setup window')
+    createSetupWindow()
+  } else {
+    consola.success('User data found, loading user data')
+    userData = (await store.get('userData')) as userData
+    consola.debug('User data loaded:', userData)
+    createMainWindow()
+  }
 })
 
 app.on('window-all-closed', () => {
@@ -480,7 +480,7 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
         })
       } else {
         const advice = await getAdvicewithGemini(
-          'The user is currently maintaining a posture that can lead to poor alignment.\
+          'The user is currently maintaining a "turtle neck" posture that can lead to poor alignment.\
              Please let them know that this could result in bad posture over time, and they should correct it' +
             fyi()
         )
@@ -515,7 +515,7 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
           const advice = await getAdvicewithGemini(
             'The user has been warned that their posture\
             could lead to misalignment, yet they continue to maintain it.\
-            Please firmly tell them that maintaining a forward head posture (text neck) can lead to serious negative consequences,\
+            Please firmly tell them that maintaining a bad posture can lead to serious negative consequences,\
             and they must correct it immediately.' + fyi()
           )
 
@@ -560,7 +560,7 @@ async function readImages(imageBuffer: Buffer): Promise<void> {
           const advice = await getAdvicewithGemini(
             'The user has been warned that their posture\
             could lead to misalignment, yet they continue to maintain it.\
-            Please firmly tell them that maintaining a forward head posture (text neck) can lead to serious negative consequences,\
+            Please firmly tell them that maintaining a tilted head posture can lead to serious negative consequences,\
             and they must correct it immediately.' + fyi()
           )
 
